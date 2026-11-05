@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-client:
+    name: Linux client
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            g++ make autoconf automake pkg-config python3 bison \
+            libxml2-dev libpng-dev libjpeg-dev \
+            libgl1-mesa-dev libglu1-mesa-dev \
+            libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev \
+            libzthread-dev libboost-dev libcurl4-openssl-dev
+
+      - name: Bootstrap
+        run: ./bootstrap.sh
+
+      - name: Configure
+        run: |
+          mkdir build
+          cd build
+          ../configure --disable-sysinstall --disable-desktop
+
+      - name: Build
+        run: make -C build -j"$(nproc)"
+
+      - name: Unit tests
+        run: make -C build check -j"$(nproc)"

@@ -3,6 +3,7 @@
 // Original: src/tools/memtest.cpp
 
 #include <cmath> // for fabs
+#include <tuple> // for std::ignore
 #include "tMemManager.h"
 #include "tLinkedList.h"
 #include "tDefer.h"
