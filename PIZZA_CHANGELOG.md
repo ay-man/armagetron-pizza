@@ -15,6 +15,12 @@ Based on upstream Armagetron Advanced `legacy_0.2.9` (commit `3198557f`).
 - Repository workflow: `main`/`develop` branches, contributing guide, pull request template.
 - GitHub Actions build check: builds the Linux client and runs the unit tests on every PR.
 
+### Changed
+
+- New players start with vertical sync off (`ARMAGETRON_VSYNC 2`) for lower input lag.
+- New players start with a frame cap of 1000 FPS instead of 360 (`MAX_FPS 1000`).
+- Both only apply on first launch; existing `user.cfg` files are not touched.
+
 ### Fixed
 
 - Unit tests failed to compile on newer GCC (`std::ignore` used without including `<tuple>`).
