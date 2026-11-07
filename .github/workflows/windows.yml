@@ -1,0 +1,53 @@
+name: Windows build
+
+# Builds a 32 bit Windows client (unzip and run, no installer) and attaches it
+# to the run as a downloadable artifact: Actions tab > run > Artifacts.
+
+on:
+  push:
+    branches: [main, develop, 'feature/**', 'fix/**', 'chore/**', 'hotfix/**']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  windows-client:
+    name: Windows client
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            mingw-w64 autoconf automake pkg-config python3 bison make unzip curl
+
+      - name: Cache libraries
+        uses: actions/cache@v4
+        with:
+          path: winwork/prefix
+          key: windows-deps-${{ hashFiles('.github/scripts/build-windows-deps.sh') }}
+
+      - name: Build libraries
+        run: |
+          if [ ! -f winwork/prefix/lib/libxml2.a ]; then
+            bash .github/scripts/build-windows-deps.sh winwork
+          fi
+
+      - name: Build client
+        run: bash .github/scripts/build-windows.sh winwork "dist/Armagetron Pizza"
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: armagetron-pizza-windows
+          path: dist
+          if-no-files-found: error

@@ -15,6 +15,7 @@ Based on upstream Armagetron Advanced `legacy_0.2.9` (commit `3198557f`).
 - Repository workflow: `main`/`develop` branches, contributing guide, pull request template.
 - GitHub Actions build check: builds the Linux client and runs the unit tests on every PR.
 - Branch policy check: PRs into `develop` must come from `feature/*`, `fix/*`, `chore/*` or `hotfix/*`; PRs into `main` only from `develop` or `hotfix/*`.
+- Windows build: GitHub Actions cross-compiles a 32 bit Windows client (unzip and run) on every push; download it from the run's Artifacts.
 
 ### Changed
 
