@@ -3883,6 +3883,25 @@ bool sg_axesIndicator=false;
 int sg_blinkFrequency=10;
 static tSettingItem< int > sg_blinkFrequencyConf( "CYCLE_BLINK_FREQUENCY", sg_blinkFrequency );
 
+// Cycle visibility aids. Client side only: they change how cycles are drawn,
+// never what is sent to the server.
+bool sg_cyclePositionMarker=true;         // marker at your own cycle's true position
+bool sg_cyclePositionMarkerEnemies=false; // same marker on everyone else's cycle
+bool sg_cycleFlatStyle=true;              // flat, bright, outlined cycles
+bool sg_cycleRubberRing=true;             // rubber and brake rings around your own cycle
+REAL sg_cycleEnemyScale=1;                // draw other cycles this much bigger
+
+static bool sg_ValidEnemyScale( REAL const & scale )
+{
+    return scale >= 1 && scale <= 2;
+}
+
+static tConfItem< bool > sg_cyclePositionMarkerConf( "CYCLE_POSITION_MARKER", sg_cyclePositionMarker );
+static tConfItem< bool > sg_cyclePositionMarkerEnemiesConf( "CYCLE_POSITION_MARKER_ENEMIES", sg_cyclePositionMarkerEnemies );
+static tConfItem< bool > sg_cycleFlatStyleConf( "CYCLE_FLAT_STYLE", sg_cycleFlatStyle );
+static tConfItem< bool > sg_cycleRubberRingConf( "CYCLE_RUBBER_RING", sg_cycleRubberRing );
+static tConfItem< REAL > sg_cycleEnemyScaleConf( "CYCLE_ENEMY_SCALE", sg_cycleEnemyScale, sg_ValidEnemyScale );
+
 #ifndef DEDICATED
 // put meriton's classes into a namespace so they can't possibly conflict with other code, especially the Colour class. --wrtl
 namespace gLaggometer {
@@ -4227,6 +4246,66 @@ void gCycleWallsDisplayListManager::RenderAll( eCamera const * camera, gCycle * 
     RenderAll( camera, cycle, wallList_ );
 }
 
+// flat cycle style: pass 0 draws the model in a flat, bright version of the
+// cycle color, pass 1 draws its back faces as thick dark lines, which leaves
+// a silhouette outline that separates the cycle from its own trail
+static void sg_BeginFlatCyclePass( int pass, gRealColor const & color )
+{
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+
+    if ( pass == 0 )
+    {
+        // keep the hue, push the brightest channel to full brightness
+        REAL brightest = std::max( color.r, std::max( color.g, color.b ) );
+        if ( brightest < .05f )
+            glColor3f( .8f, .8f, .8f );
+        else
+            glColor3f( color.r / brightest, color.g / brightest, color.b / brightest );
+    }
+    else
+    {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        glLineWidth( 3 );
+        glCullFace( GL_FRONT );
+        glColor3f( 0, 0, 0 );
+    }
+}
+
+static void sg_EndFlatCycle()
+{
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    glLineWidth( 1 );
+    glCullFace( GL_BACK );
+}
+
+// draws an arc on the floor around the origin, symmetric around the
+// direction of travel; fraction 1 is a full circle
+static void sg_RenderFloorArc( REAL centerX, REAL radius, REAL fraction )
+{
+    if ( fraction <= 0 )
+        return;
+    if ( fraction > 1 )
+        fraction = 1;
+
+    const int segments = 48;
+    int steps = int( segments * fraction + .5f );
+    if ( steps < 1 )
+        steps = 1;
+
+    REAL const span = 2 * M_PI * fraction;
+
+    // centered on the front (angle 0, the direction of travel), so as the
+    // arc shrinks the gap opens up at the back
+    glBegin( GL_LINE_STRIP );
+    for ( int i = 0; i <= steps; ++i )
+    {
+        REAL angle = -span * .5f + span * i / steps;
+        glVertex3f( centerX + radius * cos( angle ), radius * sin( angle ), .05f );
+    }
+    glEnd();
+}
+
 void gCycle::Render(const eCamera *cam){
     /*
     // for use when there's rendering problems on one specific occasion
@@ -4309,7 +4388,16 @@ void gCycle::Render(const eCamera *cam){
         glPushMatrix();
         eCoord p = PredictPosition();
         glTranslatef(p.x,p.y,0);
-        glScalef(.5f,.5f,.5f);
+
+        // is this the cycle of the player this view belongs to?
+        bool ownCycle = cam && player && cam->Player() == player;
+
+        // optionally draw other cycles bigger; the scaling is centered
+        // on the true position, so that point stays exact
+        REAL modelScale = .5f;
+        if ( !ownCycle && sg_cycleEnemyScale > 1 )
+            modelScale *= sg_cycleEnemyScale;
+        glScalef(modelScale,modelScale,modelScale);
 
 
         eCoord ske(1,skew);
@@ -4350,11 +4438,22 @@ void gCycle::Render(const eCamera *cam){
             ModelMatrix();
             if ( !blinking )
             {
-                glPushMatrix();
-                customTexture->Select();
-                glColor3f(1,1,1);
-                customModel->Render();
-                glPopMatrix();
+                int passes = sg_cycleFlatStyle ? 2 : 1;
+                for ( int pass = 0; pass < passes; ++pass )
+                {
+                    glPushMatrix();
+                    if ( sg_cycleFlatStyle )
+                        sg_BeginFlatCyclePass( pass, color_ );
+                    else
+                    {
+                        customTexture->Select();
+                        glColor3f(1,1,1);
+                    }
+                    customModel->Render();
+                    glPopMatrix();
+                }
+                if ( sg_cycleFlatStyle )
+                    sg_EndFlatCycle();
             }
 
             glPopMatrix();
@@ -4365,13 +4464,19 @@ void gCycle::Render(const eCamera *cam){
 
             ModelMatrix();
 
-            if ( !blinking )
+            // no passes while blinking; flat style needs a second outline pass
+            int passes = blinking ? 0 : ( sg_cycleFlatStyle ? 2 : 1 );
+            for ( int pass = 0; pass < passes; ++pass )
             {
-                bodyTex->Select();
+                if ( sg_cycleFlatStyle )
+                    sg_BeginFlatCyclePass( pass, color_ );
+                else
+                    bodyTex->Select();
                 body->Render();
 
-                wheelTex->Select();
-                
+                if ( !sg_cycleFlatStyle )
+                    wheelTex->Select();
+
                 glPushMatrix();
                 glTranslatef(0,0,.73);
                 
@@ -4399,7 +4504,9 @@ void gCycle::Render(const eCamera *cam){
                 front->Render();
                 glPopMatrix();
             }
-            
+            if ( passes > 0 && sg_cycleFlatStyle )
+                sg_EndFlatCycle();
+
             glPopMatrix();
         }
 
@@ -4573,6 +4680,67 @@ void gCycle::Render(const eCamera *cam){
 #endif // USE_HEADLIGHT
         // Name
         RenderName( cam );
+
+        // visibility aids, drawn in world units around the true position
+        bool showMarker = ownCycle ? sg_cyclePositionMarker : sg_cyclePositionMarkerEnemies;
+        bool showRings = ownCycle && sg_cycleRubberRing && cam && cam->RenderingMain();
+        if ( showMarker || showRings )
+        {
+            glPushMatrix();
+            REAL unscale = 1 / modelScale;
+            glScalef( unscale, unscale, unscale );
+            glDisable( GL_TEXTURE_2D );
+            glDisable( GL_LIGHTING );
+
+            if ( showMarker )
+            {
+                // crossbar across the exact position plus a short post
+                glLineWidth( 2 );
+                glColor3f( 1, 1, 1 );
+                glBegin( GL_LINES );
+                glVertex3f( 0, -.6f, .05f );
+                glVertex3f( 0,  .6f, .05f );
+                glVertex3f( 0, 0, .05f );
+                glVertex3f( 0, 0, 1.2f );
+                glEnd();
+            }
+
+            if ( showRings )
+            {
+                // ring center: middle of the cycle model, just behind the true position
+                REAL const centerX = -.3f;
+
+                // outer ring: rubber left
+                if ( sg_rubberCycle > 0 )
+                {
+                    REAL rubberLeft = 1 - GetRubber() / sg_rubberCycle;
+                    if ( rubberLeft < 0 )
+                        rubberLeft = 0;
+
+                    glLineWidth( 1 );
+                    glColor3f( .25f, .25f, .25f );
+                    sg_RenderFloorArc( centerX, 1.4f, 1 );
+
+                    glLineWidth( 3 );
+                    if ( rubberLeft > .5f )
+                        glColor3f( .2f, 1, .2f );
+                    else if ( rubberLeft > .25f )
+                        glColor3f( 1, 1, .2f );
+                    else
+                        glColor3f( 1, .2f, .2f );
+                    sg_RenderFloorArc( centerX, 1.4f, rubberLeft );
+                }
+
+                // inner ring: brakes left
+                glLineWidth( 2 );
+                glColor3f( .3f, .7f, 1 );
+                sg_RenderFloorArc( centerX, 1.1f, GetBrakingReservoir() );
+            }
+
+            glLineWidth( 1 );
+            glColor3f( 1, 1, 1 );
+            glPopMatrix();
+        }
 
 
         // shadow:
