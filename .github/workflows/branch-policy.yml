@@ -1,0 +1,44 @@
+name: Branch policy
+
+# Enforces where pull requests may come from:
+#   into develop: feature/*, fix/*, chore/* or hotfix/*
+#   into main:    develop (a release) or hotfix/* (an urgent fix)
+# Make "Branch policy" a required status check on main and develop.
+
+on:
+  pull_request:
+    branches: [main, develop]
+    types: [opened, reopened, synchronize, edited]
+
+permissions: {}
+
+jobs:
+  branch-policy:
+    name: Branch policy
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check source branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          echo "Pull request: $HEAD_REF -> $BASE_REF"
+          case "$BASE_REF" in
+            develop)
+              case "$HEAD_REF" in
+                feature/*|fix/*|chore/*|hotfix/*) ok=1 ;;
+              esac
+              allowed="feature/*, fix/*, chore/* or hotfix/*"
+              ;;
+            main)
+              case "$HEAD_REF" in
+                develop|hotfix/*) ok=1 ;;
+              esac
+              allowed="develop or hotfix/*"
+              ;;
+          esac
+          if [ -z "$ok" ]; then
+            echo "::error::Pull requests into $BASE_REF must come from $allowed (this one comes from $HEAD_REF)."
+            exit 1
+          fi
+          echo "Allowed."

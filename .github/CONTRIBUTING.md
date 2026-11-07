@@ -24,7 +24,10 @@ entries under a new version heading, merge, then tag the merge commit.
 `main` and `develop` are protected:
 
 - Changes only land through pull requests (no direct pushes).
-- The **Build / Linux client** check must pass before merging.
+- The **Linux client** build check must pass before merging.
+- The **Branch policy** check must pass: pull requests into `develop` must come
+  from `feature/*`, `fix/*`, `chore/*` or `hotfix/*`; pull requests into `main`
+  must come from `develop` (a release) or `hotfix/*` (an urgent fix).
 - Force pushes and branch deletion are blocked.
 
 ## Changelog
