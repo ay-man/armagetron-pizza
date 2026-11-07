@@ -21,6 +21,7 @@ Based on upstream Armagetron Advanced `legacy_0.2.9` (commit `3198557f`).
   - High contrast cycles: flat, bright, dark outline (`CYCLE_FLAT_STYLE`, on).
   - Rubber and brake rings around your own cycle (`CYCLE_RUBBER_RING`, on).
   - Draw opponents up to 2x bigger, sized around their true position (`CYCLE_ENEMY_SCALE`, 1).
+- Texture styles (Display Settings > Preferences > Texture Style, `TEXTURE_STYLE`): Classic, Clean, High Contrast and Minimal floor grids, trails and arena walls. Styles live in `textures/styles/<name>/` and are made by `textures/styles/generate.sh`; any texture a style doesn't replace stays classic.
 
 ### Changed
 

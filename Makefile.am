@@ -40,7 +40,10 @@ if NEEDDATA
 nobase_texture_DATA=textures/cycle_body.png textures/cycle_wheel.png textures/dir_wall.png\
 	textures/floor_a.png textures/floor_b.png textures/floor.png textures/font_extra.png\
 	textures/font.png textures/font_s.png textures/icon.png textures/rim_wall.png\
-	textures/shadow.png textures/sky.png textures/title.jpg
+	textures/shadow.png textures/sky.png textures/title.jpg\
+	textures/styles/clean/floor.png textures/styles/clean/floor_a.png textures/styles/clean/floor_b.png textures/styles/clean/dir_wall.png textures/styles/clean/rim_wall.png\
+	textures/styles/contrast/floor.png textures/styles/contrast/floor_a.png textures/styles/contrast/floor_b.png textures/styles/contrast/dir_wall.png textures/styles/contrast/rim_wall.png\
+	textures/styles/minimal/floor.png textures/styles/minimal/floor_a.png textures/styles/minimal/floor_b.png textures/styles/minimal/dir_wall.png textures/styles/minimal/rim_wall.png
 
 nobase_sound_DATA=sound/cyclrun.wav sound/expl.wav
 

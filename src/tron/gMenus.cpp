@@ -586,6 +586,24 @@ extern bool sg_cycleFlatStyle;
 extern bool sg_cycleRubberRing;
 extern REAL sg_cycleEnemyScale;
 
+// texture style, from gFloor.cpp
+extern int sg_textureStyle;
+
+class gTextureStyleMenuItem: public uMenuItemSelection< int >
+{
+public:
+    gTextureStyleMenuItem( uMenu * menu )
+            :uMenuItemSelection< int >( menu, "$texture_style_text", "$texture_style_help", sg_textureStyle )
+    {
+        NewChoice( "$texture_style_classic", "$texture_style_classic_help", 0 );
+        NewChoice( "$texture_style_clean", "$texture_style_clean_help", 1 );
+        NewChoice( "$texture_style_contrast", "$texture_style_contrast_help", 2 );
+        NewChoice( "$texture_style_minimal", "$texture_style_minimal_help", 3 );
+    }
+};
+
+static gTextureStyleMenuItem texture_style( &screen_menu_prefs );
+
 static uMenu cycle_visibility_menu("$cycle_visibility_menu");
 static uMenuItemSubmenu cycle_visibility_submenu
 (&screen_menu_prefs,&cycle_visibility_menu,

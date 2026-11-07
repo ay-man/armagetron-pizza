@@ -92,6 +92,26 @@ static rFileTexture mp_floor_b(rTextureGroups::TEX_FLOOR,"moviepack/floor_b.png"
 rFileTexture ArmageTron_floor(rTextureGroups::TEX_FLOOR,"textures/floor.png",1,1);
 rFileTexture ArmageTron_mp_floor(rTextureGroups::TEX_FLOOR,"moviepack/floor.png",1,1);
 
+// texture style: 0 classic, 1 clean, 2 high contrast, 3 minimal
+// (folders in textures/styles/). Client side only.
+int sg_textureStyle = 0;
+
+static bool sg_ValidTextureStyle( int const & style )
+{
+    return style >= 0 && style <= 3;
+}
+
+static tConfItem< int > sg_textureStyleConf( "TEXTURE_STYLE", sg_textureStyle, sg_ValidTextureStyle );
+
+// applies the style if it changed; called whenever the floor is drawn,
+// so menu changes take effect right away
+static void sg_ApplyTextureStyle()
+{
+    static char const * const styles[] = { "", "clean", "contrast", "minimal" };
+    int style = sg_ValidTextureStyle( sg_textureStyle ) ? sg_textureStyle : 0;
+    sr_SetTextureStyle( styles[ style ] );
+}
+
 class gFloor: public eFloor{
 public:
     gFloor(){};
@@ -123,6 +143,7 @@ public:
 
 
     virtual void glFloorTexture(){
+        sg_ApplyTextureStyle();
         if (sg_MoviePack())
             ArmageTron_mp_floor.Select();
         else

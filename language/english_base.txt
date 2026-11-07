@@ -2132,6 +2132,18 @@ pref_sparks_help		Glowing sparks fly from your vehicle whenever you nearly crash
 pref_explosion_text		Explosion:
 pref_explosion_help		Toggles the explosion animation when a cycle crashes.
 
+#texture styles
+texture_style_text		Texture Style:
+texture_style_help		Floor grid, trails and arena walls. Pick the one that makes distances and gaps easiest for you to read.
+texture_style_classic		Classic
+texture_style_classic_help	The original textures.
+texture_style_clean		Clean
+texture_style_clean_help	Dark floor with crisp grid lines and faint half-way lines, trails with a bright top edge, calm arena walls.
+texture_style_contrast		High Contrast
+texture_style_contrast_help	Black floor with bold white grid lines and visible half-way lines, bright trails with an outlined top edge, black arena walls with a white edge.
+texture_style_minimal		Minimal
+texture_style_minimal_help	Black floor with faint grid lines only, flat trails, plain arena walls.
+
 #cycle visibility menu
 cycle_visibility_menu		Cycle Visibility
 cycle_visibility_menu_help	Make cycles easier to read: exact positions, high contrast, rubber and brakes at a glance.
