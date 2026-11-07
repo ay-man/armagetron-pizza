@@ -17,7 +17,7 @@ echo "::group::bootstrap"
 test -x configure || ./bootstrap.sh
 echo "::endgroup::"
 
-SDL_CFLAGS="-I$P/include/SDL -D_GNU_SOURCE=1 -Dmain=SDL_main"
+SDL_CFLAGS="-I$P/include/SDL -D_GNU_SOURCE=1"
 SDL_LIBS="-L$P/lib -lmingw32 -lSDLmain -lSDL -mwindows"
 
 # stand-in for sdl-config: configure asks it whether this is a Windows build
