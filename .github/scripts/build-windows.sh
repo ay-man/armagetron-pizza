@@ -80,9 +80,32 @@ cp -r "$DATA"/. "$OUT/"
 cp -r "$CONF"/. "$OUT/config/"
 cp "$EXE" "$OUT/armagetronad.exe"
 cp "$P"/bin/*.dll "$OUT/"
+# MinGW's thread runtime, used by the game itself
+cp "$(find /usr -path "*$HOST*" -name libwinpthread-1.dll | head -1)" "$OUT/"
+# MP3 music only, needs an old C++ runtime; the game does not use MP3
+rm -f "$OUT/smpeg.dll"
+# Linux-only helpers
+rm -rf "$OUT/desktop" "$OUT/scripts"
 cp "$SRCDIR/COPYING.txt" "$OUT/" 2>/dev/null || true
 cp "$SRCDIR/PIZZA_CHANGELOG.md" "$OUT/"
 "$HOST-strip" "$OUT/armagetronad.exe"
+
+# every DLL the exe or a shipped DLL imports must be shipped or part of Windows
+echo "::group::check DLLs"
+missing=0
+for f in "$OUT"/*.exe "$OUT"/*.dll; do
+    for dll in $("$HOST-objdump" -p "$f" | awk '/DLL Name/ {print $3}'); do
+        if [ -e "$OUT/$dll" ]; then continue; fi
+        case "$(echo "$dll" | tr 'A-Z' 'a-z')" in
+            kernel32.dll|user32.dll|gdi32.dll|advapi32.dll|shell32.dll|msvcrt.dll|winmm.dll|\
+            ws2_32.dll|wsock32.dll|opengl32.dll|glu32.dll|ole32.dll|oleaut32.dll|imm32.dll|\
+            version.dll|setupapi.dll|dinput.dll|dsound.dll|ddraw.dll|dxguid.dll|comdlg32.dll) ;;
+            *) echo "::error::$(basename "$f") needs $dll, which is not shipped"; missing=1 ;;
+        esac
+    done
+done
+echo "::endgroup::"
+[ "$missing" = 0 ]
 
 echo "Windows build ready in $OUT:"
 ls "$OUT"
