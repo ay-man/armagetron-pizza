@@ -5,6 +5,11 @@
    GetUserNameA and friends) apply consistently to every file */
 #include <windows.h>
 
+/* declare the POSIX close()/open() before nSocket.cpp maps close to
+   closesocket, so its own later include of unistd.h is a no-op */
+#include <io.h>
+#include <unistd.h>
+
 /* the particle library is compiled into the game, not used as a DLL */
 #define PARTICLEDLL_EXPORTS
 
