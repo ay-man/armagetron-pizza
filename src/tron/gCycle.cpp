@@ -54,6 +54,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <fstream>
 #include <memory>
+#include <map>
+#include <string>
 
 #ifndef DEDICATED
 #define DONTDOIT
@@ -2061,16 +2063,20 @@ struct gCycleVisuals
     // loads a specific texture from a specific folder
     static rSurface * LoadTextureSafe2( Slot slot, int mp )
     {
-        static std::unique_ptr<rSurface> cache[SLOT_MAX][2];
-        std::unique_ptr<rSurface> & surface = cache[slot][mp];
+        static char const * names[SLOT_MAX]={"bike.png","cycle_body.png", "cycle_wheel.png"};
+        char const * name = names[slot];
+
+        char const * folder = mp ? "moviepack" : "textures";
+        tString file = tString(folder) + "/" + name;
+
+        // use the texture style's version if it has one; cached by file so a
+        // style change applies to the cycles of the next round
+        file = sr_StyledFileName( file );
+
+        static std::map< std::string, std::unique_ptr<rSurface> > cache;
+        std::unique_ptr<rSurface> & surface = cache[ std::string( file ) ];
         if ( surface.get() == NULL )
         {
-            static char const * names[SLOT_MAX]={"bike.png","cycle_body.png", "cycle_wheel.png"};
-            char const * name = names[slot];
-
-            char const * folder = mp ? "moviepack" : "textures";
-            tString file = tString(folder) + "/" + name;
-
             surface.reset( tNEW( rSurface( file ) ) );
         }
 

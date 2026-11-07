@@ -9,6 +9,9 @@
 #   dir_wall.png  256x256 trail texture, tinted with the player colour;
 #                 image top = top of the trail
 #   rim_wall.png  256x256 arena wall; image bottom = bottom of the wall
+#   cycle_body.png, cycle_wheel.png  the cycle's textures, derived from the
+#                 classic ones so they still fit the model; transparent
+#                 pixels show the player colour, opaque ones their grey
 # Usage: sh textures/styles/generate.sh   (from the repository root)
 set -e
 cd "$(dirname "$0")"
@@ -56,6 +59,30 @@ rim() {
     convert -size 256x256 "xc:$wall" -draw "$draw" -strip "PNG24:$out"
 }
 
+# cycle <dir> <mode>: derive the cycle textures from the classic ones
+#   outline: keep the dark lines and wheels black, everything else player colour
+#   white:   turn the dark lines and wheels white, everything else player colour
+#   solid:   player colour only
+cycle() {
+    dir=$1; mode=$2
+    for f in cycle_body cycle_wheel; do
+        src="../$f.png"
+        # dark, opaque pixels of the classic texture: lines and tyres
+        convert "$src" -alpha on \( +clone -alpha extract \) \( -clone 0 -alpha off -colorspace Gray \) \
+            -delete 0 -fx "u>0.5 && v<0.3 ? 1 : 0" "$dir/$f.mask.png"
+        case $mode in
+            outline) convert "$dir/$f.mask.png" -negate "$dir/$f.grey.png" ;;
+            white)   convert "$dir/$f.mask.png" "$dir/$f.grey.png" ;;
+            solid)   convert "$dir/$f.mask.png" -evaluate set 0 "$dir/$f.grey.png"
+                     convert "$dir/$f.mask.png" -evaluate set 0 "$dir/$f.mask.png" ;;
+        esac
+        # grey = the visible shade, alpha = where it shows (elsewhere player colour)
+        convert "$dir/$f.grey.png" "$dir/$f.mask.png" -alpha off -compose CopyOpacity -composite \
+            -colorspace Gray -define png:color-type=4 -strip "$dir/$f.png"
+        rm -f "$dir/$f.mask.png" "$dir/$f.grey.png"
+    done
+}
+
 mkdir -p clean contrast minimal
 
 # Clean: calm and readable
@@ -63,17 +90,20 @@ floor clean/floor.png    '#06080b' '#9aa4b0' 5 '#3a424c' 4
 strips clean 225 3 70 4
 trail clean/dir_wall.png '#8c8c8c' '#ffffff' 18 '' '' '#cfcfcf' 6
 rim   clean/rim_wall.png '#0b0e14' '#1c212a' 200 '#e6edf5' 4 '#5a6270' 3
+cycle clean outline
 
 # High Contrast: maximum separation
 floor contrast/floor.png    '#000000' '#ffffff' 7 '#7a7a7a' 5
 strips contrast 255 5 150 6
 trail contrast/dir_wall.png '#e6e6e6' '#ffffff' 16 '#2a2a2a' 4 '#ffffff' 6
 rim   contrast/rim_wall.png '#000000' '#2c2c2c' 212 '#ffffff' 5 '#ffffff' 3
+cycle contrast white
 
 # Minimal: nothing but what you need
 floor minimal/floor.png    '#000000' '#4a5058' 3
 strips minimal 120 2
 trail minimal/dir_wall.png '#a0a0a0' '#c8c8c8' 6
 rim   minimal/rim_wall.png '#101215' '#101215' 228 '#4a4f57' 2
+cycle minimal solid
 
 echo "generated: $(ls */*.png | tr '\n' ' ')"

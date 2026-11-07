@@ -721,7 +721,7 @@ void sr_SetTextureStyle( char const * style )
 
 // returns the file to load for a texture: its replacement in the active
 // style if there is one, otherwise the file itself
-static tString sr_StyledFileName( tString const & fileName )
+tString sr_StyledFileName( tString const & fileName )
 {
     static char const prefix[] = "textures/";
     size_t const prefixLen = sizeof( prefix ) - 1;
