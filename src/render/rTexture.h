@@ -35,6 +35,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 struct SDL_Surface;
 
 //! class organizing textures into groups (very crudely...)
+//! switches to a texture style: files in textures/styles/<style>/ replace
+//! the ones in textures/; empty or NULL means the classic textures
+void sr_SetTextureStyle( char const * style );
+
+//! the file to load for a texture: its replacement in the active texture
+//! style if there is one, otherwise fileName itself
+tString sr_StyledFileName( tString const & fileName );
+
 class rTextureGroups
 {
 public:

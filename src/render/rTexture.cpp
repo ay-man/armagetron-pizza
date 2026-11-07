@@ -703,11 +703,45 @@ rFileTexture::~rFileTexture( void )
 //!
 // ******************************************************************************************
 
+// the active texture style: textures/styles/<style>/ holds replacements for
+// files in textures/; empty means the classic textures
+static tString sr_textureStyle;
+
+void sr_SetTextureStyle( char const * style )
+{
+    tString newStyle( style ? style : "" );
+    if ( newStyle == sr_textureStyle )
+        return;
+
+    sr_textureStyle = newStyle;
+
+    // drop all loaded textures; each reloads with the new style on next use
+    rITexture::UnloadAll();
+}
+
+// returns the file to load for a texture: its replacement in the active
+// style if there is one, otherwise the file itself
+tString sr_StyledFileName( tString const & fileName )
+{
+    static char const prefix[] = "textures/";
+    size_t const prefixLen = sizeof( prefix ) - 1;
+
+    if ( sr_textureStyle.Len() > 1 && strncmp( fileName, prefix, prefixLen ) == 0 )
+    {
+        tString styled;
+        styled << prefix << "styles/" << sr_textureStyle << "/" << ( static_cast< char const * >( fileName ) + prefixLen );
+        if ( tDirectories::Data().GetReadPath( styled ).Len() > 1 )
+            return styled;
+    }
+
+    return fileName;
+}
+
 void rFileTexture::OnSelect()
 {
 #ifndef DEDICATED
     // std::cerr << "loading texture " << fileName_ << "\n";
-    rSurface surface( fileName_ );
+    rSurface surface( sr_StyledFileName( fileName_ ) );
     if ( surface.GetSurface() )
     {
         this->Upload( surface );
