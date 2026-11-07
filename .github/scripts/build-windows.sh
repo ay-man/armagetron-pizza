@@ -60,12 +60,13 @@ cd "$BUILD"
 echo "::endgroup::"
 
 echo "::group::build"
-make -k -j"$(nproc)"
+# internal test programs are not shipped and do not link with SDLmain
+make -j"$(nproc)" noinst_PROGRAMS=
 echo "::endgroup::"
 
 echo "::group::stage"
 rm -rf "$STAGE"
-make install DESTDIR="$STAGE"
+make install DESTDIR="$STAGE" noinst_PROGRAMS=
 echo "::endgroup::"
 
 # flatten: data folders next to the exe, settings in config/
