@@ -12,6 +12,6 @@
 
 ## Checklist
 
-- [ ] Branch is `feature/*`, `fix/*` or `chore/*`, targeting `develop` (or `release`/`hotfix` targeting `main`)
+- [ ] Branch is `feature/*`, `fix/*` or `chore/*`, targeting `develop` (or `develop`/`hotfix/*` targeting `main`)
 - [ ] `PIZZA_CHANGELOG.md` updated under **Unreleased**
 - [ ] Build check passes
