@@ -39,7 +39,7 @@ tar -C "$SRC" -xJf "$(fetch https://download.gnome.org/sources/libxml2/2.9/libxm
   CPPFLAGS="-I$PREFIX/include" LDFLAGS="-L$PREFIX/lib" \
   ./configure --host=$HOST --prefix="$PREFIX" --disable-shared --enable-static \
       --without-python --without-lzma --without-iconv --without-icu \
-      --with-http --with-zlib="$PREFIX" &&
+      --with-http --without-catalog --with-zlib="$PREFIX" &&
   make -j"$JOBS" && make install )
 echo "::endgroup::"
 
