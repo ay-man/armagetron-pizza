@@ -17,17 +17,40 @@ echo "::group::bootstrap"
 test -x configure || ./bootstrap.sh
 echo "::endgroup::"
 
+SDL_CFLAGS="-I$P/include/SDL -D_GNU_SOURCE=1 -Dmain=SDL_main"
+SDL_LIBS="-L$P/lib -lmingw32 -lSDLmain -lSDL -mwindows"
+
+# stand-in for sdl-config: configure asks it whether this is a Windows build
+mkdir -p "$WORK/tools"
+cat > "$WORK/tools/sdl-config" <<EOF
+#!/bin/sh
+case "\$1" in
+  --cflags) echo "$SDL_CFLAGS" ;;
+  --libs) echo "$SDL_LIBS" ;;
+  --version) echo 1.2.15 ;;
+esac
+EOF
+chmod +x "$WORK/tools/sdl-config"
+export PATH="$WORK/tools:$PATH"
+
 echo "::group::configure"
 rm -rf "$BUILD" && mkdir -p "$BUILD"
 cd "$BUILD"
+# Windows system libraries use the stdcall convention, which autoconf's
+# generic link tests can't detect, so declare them as present.
 "$SRCDIR/configure" --host=$HOST --prefix=/ \
-    --disable-sysinstall --disable-desktop --disable-uninstall \
+    --disable-sysinstall --disable-desktop --disable-uninstall --enable-music \
+    ac_cv_lib_opengl32_glVertex3f=yes \
+    ac_cv_lib_glu32_gluBuild3DMipmaps=yes \
+    ac_cv_lib_wsock32_connect=yes \
+    ac_cv_lib_SDL_mixer_Mix_OpenAudio=yes \
+    SDL_CONFIG="$WORK/tools/sdl-config" \
     CPPFLAGS="-I$P/include -I$P/include/SDL" \
     LDFLAGS="-L$P/lib -L$P/bin -static-libgcc -static-libstdc++" \
-    SDL_CFLAGS="-I$P/include/SDL -D_GNU_SOURCE=1 -Dmain=SDL_main" \
-    SDL_LIBS="-L$P/lib -lmingw32 -lSDLmain -lSDL -mwindows" \
+    SDL_CFLAGS="$SDL_CFLAGS" \
+    SDL_LIBS="$SDL_LIBS" \
     SDL_IMAGE_CFLAGS="-I$P/include/SDL" \
-    SDL_IMAGE_LIBS="-L$P/bin -lSDL_image" \
+    SDL_IMAGE_LIBS="-L$P/bin -lSDL_image $SDL_LIBS" \
     XML2_CFLAGS="-I$P/include/libxml2 -DLIBXML_STATIC" \
     XML2_LIBS="-L$P/lib -lxml2 -lz -lws2_32" \
     LIBPNG_CFLAGS="-I$P/include/libpng16" \
