@@ -39,7 +39,7 @@ cd "$BUILD"
 # Windows system libraries use the stdcall convention, which autoconf's
 # generic link tests can't detect, so declare them as present.
 "$SRCDIR/configure" --host=$HOST --prefix=/ \
-    --disable-sysinstall --disable-desktop --disable-uninstall --enable-music \
+    --disable-sysinstall --disable-desktop --disable-uninstall --enable-music --disable-binreloc \
     ac_cv_lib_opengl32_glVertex3f=yes \
     ac_cv_lib_glu32_gluBuild3DMipmaps=yes \
     ac_cv_lib_wsock32_connect=yes \
