@@ -4521,6 +4521,10 @@ void gCycle::Render(const eCamera *cam){
                 sg_EndFlatCycle();
 
             glPopMatrix();
+
+            // everything drawn after the model (name, shadow, lag-o-meter)
+            // expects the classic placement; restore it if the model moved
+            glTranslatef(-1.5f - modelShift,0,0);
         }
 
 
@@ -4700,6 +4704,9 @@ void gCycle::Render(const eCamera *cam){
         if ( showMarker || showRings )
         {
             glPushMatrix();
+            // the frame here is the classic model placement, 1.5 model units
+            // behind the true position; move to the true position itself
+            glTranslatef( 1.5f, 0, 0 );
             REAL unscale = 1 / modelScale;
             glScalef( unscale, unscale, unscale );
             glDisable( GL_TEXTURE_2D );
