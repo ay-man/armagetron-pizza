@@ -2132,6 +2132,20 @@ pref_sparks_help		Glowing sparks fly from your vehicle whenever you nearly crash
 pref_explosion_text		Explosion:
 pref_explosion_help		Toggles the explosion animation when a cycle crashes.
 
+#cycle visibility menu
+cycle_visibility_menu		Cycle Visibility
+cycle_visibility_menu_help	Make cycles easier to read: exact positions, high contrast, rubber and brakes at a glance.
+cycle_position_marker_text	Position Marker:
+cycle_position_marker_help	Draws a white marker exactly where your cycle really is: the point where your wall starts and where crashes count. The cycle model itself sticks out in front of it.
+cycle_position_marker_enemies_text	Opponent Markers:
+cycle_position_marker_enemies_help	Draws the same position marker on every other cycle.
+cycle_flat_style_text		High Contrast Cycles:
+cycle_flat_style_help		Draws cycles flat and bright with a dark outline, so they stand out from the floor and from trails of the same colour.
+cycle_rubber_ring_text		Rubber Ring:
+cycle_rubber_ring_help		Draws two rings around your cycle. Outer: rubber left (green, then yellow, then red; it shrinks from the back). Inner, blue: brakes left.
+cycle_enemy_scale_text		Opponent Size:
+cycle_enemy_scale_help		Draws other cycles bigger so they are easier to spot. Sized around their true position.
+
 pref_skymove_text		Sky Movement:
 pref_skymove_help		Toggles the animation of the lower sky plane.
 

@@ -15,6 +15,11 @@ Based on upstream Armagetron Advanced `legacy_0.2.9` (commit `3198557f`).
 - Repository workflow: `main`/`develop` branches, contributing guide, pull request template.
 - GitHub Actions build check: builds the Linux client and runs the unit tests on every PR.
 - Branch policy check: PRs into `develop` must come from `feature/*`, `fix/*`, `chore/*` or `hotfix/*`; PRs into `main` only from `develop` or `hotfix/*`.
+- Cycle visibility aids (Display Settings > Preferences > Cycle Visibility), all client side:
+  - Position marker at your cycle's true position (`CYCLE_POSITION_MARKER`, on), optionally on opponents too (`CYCLE_POSITION_MARKER_ENEMIES`, off).
+  - High contrast cycles: flat, bright, dark outline (`CYCLE_FLAT_STYLE`, on).
+  - Rubber and brake rings around your own cycle (`CYCLE_RUBBER_RING`, on).
+  - Draw opponents up to 2x bigger, sized around their true position (`CYCLE_ENEMY_SCALE`, 1).
 
 ### Changed
 

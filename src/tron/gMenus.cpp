@@ -579,6 +579,43 @@ static uMenuItemToggle cs
  "$pref_sparks_help",
  crash_sparks);
 
+// cycle visibility aids, from gCycle.cpp
+extern bool sg_cyclePositionMarker;
+extern bool sg_cyclePositionMarkerEnemies;
+extern bool sg_cycleFlatStyle;
+extern bool sg_cycleRubberRing;
+extern REAL sg_cycleEnemyScale;
+
+static uMenu cycle_visibility_menu("$cycle_visibility_menu");
+static uMenuItemSubmenu cycle_visibility_submenu
+(&screen_menu_prefs,&cycle_visibility_menu,
+ "$cycle_visibility_menu_help");
+
+static uMenuItemReal cycle_enemy_scale
+(&cycle_visibility_menu,"$cycle_enemy_scale_text",
+ "$cycle_enemy_scale_help",
+ sg_cycleEnemyScale,1,2,.25);
+
+static uMenuItemToggle cycle_flat_style
+(&cycle_visibility_menu,"$cycle_flat_style_text",
+ "$cycle_flat_style_help",
+ sg_cycleFlatStyle);
+
+static uMenuItemToggle cycle_rubber_ring
+(&cycle_visibility_menu,"$cycle_rubber_ring_text",
+ "$cycle_rubber_ring_help",
+ sg_cycleRubberRing);
+
+static uMenuItemToggle cycle_marker_enemies
+(&cycle_visibility_menu,"$cycle_position_marker_enemies_text",
+ "$cycle_position_marker_enemies_help",
+ sg_cyclePositionMarkerEnemies);
+
+static uMenuItemToggle cycle_marker
+(&cycle_visibility_menu,"$cycle_position_marker_text",
+ "$cycle_position_marker_help",
+ sg_cyclePositionMarker);
+
 static uMenuItemSelection<rDisplayListUsage> dl
 (&screen_menu_tweaks,"$tweaks_displaylists_text",
  "$tweaks_displaylists_help", sr_useDisplayLists);
