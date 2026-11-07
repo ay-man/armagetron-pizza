@@ -45,7 +45,7 @@ cd "$BUILD"
     ac_cv_lib_wsock32_connect=yes \
     ac_cv_lib_SDL_mixer_Mix_OpenAudio=yes \
     SDL_CONFIG="$WORK/tools/sdl-config" \
-    CPPFLAGS="-I$P/include -I$P/include/SDL" \
+    CPPFLAGS="-include $SRCDIR/.github/scripts/mingw-config.h -I$P/include -I$P/include/SDL" \
     LDFLAGS="-L$P/lib -L$P/bin -static-libgcc -static-libstdc++" \
     SDL_CFLAGS="$SDL_CFLAGS" \
     SDL_LIBS="$SDL_LIBS" \
@@ -59,7 +59,7 @@ cd "$BUILD"
 echo "::endgroup::"
 
 echo "::group::build"
-make -j"$(nproc)"
+make -k -j"$(nproc)"
 echo "::endgroup::"
 
 echo "::group::stage"
