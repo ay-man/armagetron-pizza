@@ -17,6 +17,7 @@ Based on upstream Armagetron Advanced `legacy_0.2.9` (commit `3198557f`).
 - Branch policy check: PRs into `develop` must come from `feature/*`, `fix/*`, `chore/*` or `hotfix/*`; PRs into `main` only from `develop` or `hotfix/*`.
 - Windows build: GitHub Actions cross-compiles a 32 bit Windows client (unzip and run) on every push; download it from the run's Artifacts.
 - Cycle visibility aids (Display Settings > Preferences > Cycle Visibility), all client side:
+  - Exact front: the cycle model's nose sits exactly on the true position, where you turn and where crashes count (`CYCLE_FRONT_EXACT`, on).
   - Position marker at your cycle's true position (`CYCLE_POSITION_MARKER`, on), optionally on opponents too (`CYCLE_POSITION_MARKER_ENEMIES`, off).
   - High contrast cycles: flat, bright, dark outline (`CYCLE_FLAT_STYLE`, on).
   - Rubber and brake rings around your own cycle (`CYCLE_RUBBER_RING`, on).

@@ -2143,6 +2143,8 @@ cycle_flat_style_text		High Contrast Cycles:
 cycle_flat_style_help		Draws cycles flat and bright with a dark outline, so they stand out from the floor and from trails of the same colour.
 cycle_rubber_ring_text		Rubber Ring:
 cycle_rubber_ring_help		Draws two rings around your cycle. Outer: rubber left (green, then yellow, then red; it shrinks from the back). Inner, blue: brakes left.
+cycle_front_exact_text		Exact Front:
+cycle_front_exact_help		Moves the cycle model back so the tip of its front wheel sits exactly where your cycle really is: the point you turn from and where crashes count. Off: the classic model, whose nose sticks out about 0.4 units ahead.
 cycle_enemy_scale_text		Opponent Size:
 cycle_enemy_scale_help		Draws other cycles bigger so they are easier to spot. Sized around their true position.
 

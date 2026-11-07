@@ -584,6 +584,7 @@ extern bool sg_cyclePositionMarker;
 extern bool sg_cyclePositionMarkerEnemies;
 extern bool sg_cycleFlatStyle;
 extern bool sg_cycleRubberRing;
+extern bool sg_cycleFrontExact;
 extern REAL sg_cycleEnemyScale;
 
 static uMenu cycle_visibility_menu("$cycle_visibility_menu");
@@ -610,6 +611,11 @@ static uMenuItemToggle cycle_marker_enemies
 (&cycle_visibility_menu,"$cycle_position_marker_enemies_text",
  "$cycle_position_marker_enemies_help",
  sg_cyclePositionMarkerEnemies);
+
+static uMenuItemToggle cycle_front_exact
+(&cycle_visibility_menu,"$cycle_front_exact_text",
+ "$cycle_front_exact_help",
+ sg_cycleFrontExact);
 
 static uMenuItemToggle cycle_marker
 (&cycle_visibility_menu,"$cycle_position_marker_text",
