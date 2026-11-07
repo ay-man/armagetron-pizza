@@ -3895,6 +3895,7 @@ bool sg_cyclePositionMarker=true;         // marker at your own cycle's true pos
 bool sg_cyclePositionMarkerEnemies=false; // same marker on everyone else's cycle
 bool sg_cycleFlatStyle=true;              // flat, bright, outlined cycles
 bool sg_cycleRubberRing=true;             // rubber and brake rings around your own cycle
+bool sg_cycleFrontExact=true;             // put the model's nose exactly on the true position
 REAL sg_cycleEnemyScale=1;                // draw other cycles this much bigger
 
 static bool sg_ValidEnemyScale( REAL const & scale )
@@ -3906,6 +3907,7 @@ static tConfItem< bool > sg_cyclePositionMarkerConf( "CYCLE_POSITION_MARKER", sg
 static tConfItem< bool > sg_cyclePositionMarkerEnemiesConf( "CYCLE_POSITION_MARKER_ENEMIES", sg_cyclePositionMarkerEnemies );
 static tConfItem< bool > sg_cycleFlatStyleConf( "CYCLE_FLAT_STYLE", sg_cycleFlatStyle );
 static tConfItem< bool > sg_cycleRubberRingConf( "CYCLE_RUBBER_RING", sg_cycleRubberRing );
+static tConfItem< bool > sg_cycleFrontExactConf( "CYCLE_FRONT_EXACT", sg_cycleFrontExact );
 static tConfItem< REAL > sg_cycleEnemyScaleConf( "CYCLE_ENEMY_SCALE", sg_cycleEnemyScale, sg_ValidEnemyScale );
 
 #ifndef DEDICATED
@@ -4415,10 +4417,15 @@ void gCycle::Render(const eCamera *cam){
                          {0,0,0,1}};
         glMultMatrixf(&m[0][0]);
 
+        // where the model sits relative to the true position (in model units):
+        // classically its nose sticks out ahead; with CYCLE_FRONT_EXACT the tip of
+        // the front wheel (x = 1.84 + 0.44 in the model) sits exactly on it
+        REAL const modelShift = sg_cycleFrontExact ? -2.28f : -1.5f;
+
         glPushMatrix();
         //glTranslatef(-1.84,0,0);
         if (!mp)
-            glTranslatef(-1.5,0,0);
+            glTranslatef(modelShift,0,0);
 
         glPushMatrix();
 
@@ -4714,7 +4721,7 @@ void gCycle::Render(const eCamera *cam){
             if ( showRings )
             {
                 // ring center: middle of the cycle model, just behind the true position
-                REAL const centerX = -.3f;
+                REAL const centerX = sg_cycleFrontExact ? -.7f : -.3f;
 
                 // outer ring: rubber left
                 if ( sg_rubberCycle > 0 )
@@ -4761,6 +4768,8 @@ void gCycle::Render(const eCamera *cam){
         if(!blinking && sr_floorDetail>rFLOOR_GRID && rTextureGroups::TextureMode[rTextureGroups::TEX_FLOOR]>0 && sr_alphaBlend){
             glColor3f(0,0,0);
             cycle_shad.Select();
+            glPushMatrix();
+            glTranslatef(modelShift + 1.5f,0,0); // follow the model
             BeginQuads();
             glTexCoord2f(0,1);
             glVertex3f(-.6,.4,h);
@@ -4775,6 +4784,7 @@ void gCycle::Render(const eCamera *cam){
             glVertex3f(2.1,.4,h);
 
             RenderEnd();
+            glPopMatrix();
         }
 
         glDisable(GL_CULL_FACE);
