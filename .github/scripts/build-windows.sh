@@ -45,7 +45,8 @@ cd "$BUILD"
     ac_cv_lib_wsock32_connect=yes \
     ac_cv_lib_SDL_mixer_Mix_OpenAudio=yes \
     SDL_CONFIG="$WORK/tools/sdl-config" \
-    CPPFLAGS="-include $SRCDIR/.github/scripts/mingw-config.h -I$P/include -I$P/include/SDL" \
+    CPPFLAGS="-I$P/include -I$P/include/SDL" \
+    CXXFLAGS="-O2 -include $SRCDIR/.github/scripts/mingw-config.h" \
     LDFLAGS="-L$P/lib -L$P/bin -static-libgcc -static-libstdc++" \
     SDL_CFLAGS="$SDL_CFLAGS" \
     SDL_LIBS="$SDL_LIBS" \
