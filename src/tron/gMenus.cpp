@@ -605,6 +605,22 @@ public:
 
 static gTextureStyleMenuItem texture_style( &screen_menu_prefs );
 
+// custom cycle model, from gCycle.cpp
+extern tString sg_cycleModel;
+
+class gCycleModelMenuItem: public uMenuItemSelection< tString >
+{
+public:
+    gCycleModelMenuItem( uMenu * menu )
+            :uMenuItemSelection< tString >( menu, "$cycle_model_text", "$cycle_model_help", sg_cycleModel )
+    {
+        NewChoice( "$cycle_model_classic", "$cycle_model_classic_help", tString("") );
+        NewChoice( "$cycle_model_garbage_truck", "$cycle_model_garbage_truck_help", tString("garbage_truck") );
+    }
+};
+
+static gCycleModelMenuItem cycle_model( &screen_menu_prefs );
+
 static uMenu cycle_visibility_menu("$cycle_visibility_menu");
 static uMenuItemSubmenu cycle_visibility_submenu
 (&screen_menu_prefs,&cycle_visibility_menu,

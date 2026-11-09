@@ -4,6 +4,7 @@ uninstaller=@progname@@executable_suffix@-uninstall
 # data locations
 armadatadir=${aa_datadir}
 texturedir=${armadatadir}
+cyclesdir=${armadatadir}
 sounddir=${armadatadir}
 languagedir=${armadatadir}
 modeldir=${armadatadir}
@@ -44,6 +45,8 @@ nobase_texture_DATA=textures/cycle_body.png textures/cycle_wheel.png textures/di
 	textures/styles/clean/floor.png textures/styles/clean/floor_a.png textures/styles/clean/floor_b.png textures/styles/clean/dir_wall.png textures/styles/clean/rim_wall.png textures/styles/clean/cycle_body.png textures/styles/clean/cycle_wheel.png\
 	textures/styles/contrast/floor.png textures/styles/contrast/floor_a.png textures/styles/contrast/floor_b.png textures/styles/contrast/dir_wall.png textures/styles/contrast/rim_wall.png textures/styles/contrast/cycle_body.png textures/styles/contrast/cycle_wheel.png\
 	textures/styles/minimal/floor.png textures/styles/minimal/floor_a.png textures/styles/minimal/floor_b.png textures/styles/minimal/dir_wall.png textures/styles/minimal/rim_wall.png textures/styles/minimal/cycle_body.png textures/styles/minimal/cycle_wheel.png
+
+nobase_cycles_DATA=cycles/garbage_truck/cycle.ase cycles/garbage_truck/bike.png
 
 nobase_sound_DATA=sound/cyclrun.wav sound/expl.wav
 

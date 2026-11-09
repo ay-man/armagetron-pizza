@@ -2248,6 +2248,9 @@ void gCycle::MyInitAfterCreation(){
     wheelTex = NULL;
     bodyTex = NULL;
     customTexture = NULL;
+    styleModel_ = NULL;
+    styleTexture_ = NULL;
+    styleFront_ = styleBack_ = 0;
 
     correctPosSmooth=eCoord(0,0);
 
@@ -2455,6 +2458,7 @@ gCycle::~gCycle(){
         delete wheelTex;
         delete bodyTex;
     }
+    delete styleTexture_;
 #ifdef DEBUG
     //con << "Deleted cycle.\n";
 #endif
@@ -3910,6 +3914,12 @@ static tConfItem< bool > sg_cycleRubberRingConf( "CYCLE_RUBBER_RING", sg_cycleRu
 static tConfItem< bool > sg_cycleFrontExactConf( "CYCLE_FRONT_EXACT", sg_cycleFrontExact );
 static tConfItem< REAL > sg_cycleEnemyScaleConf( "CYCLE_ENEMY_SCALE", sg_cycleEnemyScale, sg_ValidEnemyScale );
 
+// custom model for your own cycle: the name of a folder cycles/<name>/ with
+// cycle.ase and bike.png, searched in the game data and your user data
+// folder; empty for the classic cycle
+tString sg_cycleModel;
+static tConfItemLine sg_cycleModelConf( "CYCLE_MODEL", sg_cycleModel );
+
 #ifndef DEDICATED
 // put meriton's classes into a namespace so they can't possibly conflict with other code, especially the Colour class. --wrtl
 namespace gLaggometer {
@@ -4314,6 +4324,40 @@ static void sg_RenderFloorArc( REAL centerX, REAL radius, REAL fraction )
     glEnd();
 }
 
+// (re)loads the custom cycle model when CYCLE_MODEL changed
+void gCycle::UpdateStyleModel()
+{
+    if ( styleModelName_ == sg_cycleModel )
+        return;
+    styleModelName_ = sg_cycleModel;
+
+    delete styleTexture_;
+    styleTexture_ = NULL;
+    styleModel_ = NULL;
+
+    if ( sg_cycleModel.Len() <= 1 )
+        return;
+
+    tString base;
+    base << "cycles/" << sg_cycleModel << "/";
+
+    rModel * model = rModel::GetModel( base + "cycle.ase" );
+    if ( !model || !model->LengthBounds( styleBack_, styleFront_ ) )
+        return;
+
+    // textures re-read their image when reloaded, so keep the images around
+    static std::map< std::string, std::unique_ptr< rSurface > > surfaces;
+    tString textureFile = base + "bike.png";
+    std::unique_ptr< rSurface > & surface = surfaces[ std::string( textureFile ) ];
+    if ( !surface.get() )
+        surface.reset( tNEW( rSurface( textureFile ) ) );
+    if ( !surface->GetSurface() )
+        return;
+
+    styleModel_ = model;
+    styleTexture_ = tNEW( gTextureCycle )( *surface, color_, 0, 0 );
+}
+
 void gCycle::Render(const eCamera *cam){
     /*
     // for use when there's rendering problems on one specific occasion
@@ -4420,11 +4464,24 @@ void gCycle::Render(const eCamera *cam){
         // where the model sits relative to the true position (in model units):
         // classically its nose sticks out ahead; with CYCLE_FRONT_EXACT the tip of
         // the front wheel (x = 1.84 + 0.44 in the model) sits exactly on it
-        REAL const modelShift = sg_cycleFrontExact ? -2.28f : -1.5f;
+        REAL modelShift = sg_cycleFrontExact ? -2.28f : -1.5f;
+
+        // your own cycle may use a custom model (CYCLE_MODEL); its front-most
+        // point is always placed exactly on the true position
+        bool styleModel = false;
+        if ( ownCycle )
+        {
+            UpdateStyleModel();
+            styleModel = styleModel_ && styleTexture_;
+            if ( styleModel )
+                modelShift = -styleFront_;
+        }
+        rModel * drawModel = styleModel ? styleModel_ : customModel;
+        gTextureCycle * drawTexture = styleModel ? styleTexture_ : customTexture;
 
         glPushMatrix();
         //glTranslatef(-1.84,0,0);
-        if (!mp)
+        if (!mp || styleModel)
             glTranslatef(modelShift,0,0);
 
         glPushMatrix();
@@ -4446,31 +4503,36 @@ void gCycle::Render(const eCamera *cam){
         TexMatrix();
         IdentityMatrix();
 
-        if (mp){
+        if (mp || styleModel){
+
+            // custom models bring their own colours, so they skip the flat style
+            bool flat = sg_cycleFlatStyle && !styleModel;
 
             ModelMatrix();
             if ( !blinking )
             {
-                int passes = sg_cycleFlatStyle ? 2 : 1;
+                int passes = flat ? 2 : 1;
                 for ( int pass = 0; pass < passes; ++pass )
                 {
                     glPushMatrix();
-                    if ( sg_cycleFlatStyle )
+                    if ( flat )
                         sg_BeginFlatCyclePass( pass, color_ );
                     else
                     {
-                        customTexture->Select();
+                        glEnable(GL_TEXTURE_2D);
+                        drawTexture->Select();
                         glColor3f(1,1,1);
                     }
-                    customModel->Render();
+                    drawModel->Render();
                     glPopMatrix();
                 }
-                if ( sg_cycleFlatStyle )
+                if ( flat )
                     sg_EndFlatCycle();
             }
 
             glPopMatrix();
-            glTranslatef(-1.5,0,0);
+            // back to the classic placement for what follows (name, shadow, ...)
+            glTranslatef(-1.5f - ( styleModel ? modelShift : 0 ),0,0);
         }
         else{
             glEnable(GL_TEXTURE_2D);
@@ -4776,7 +4838,17 @@ void gCycle::Render(const eCamera *cam){
             glColor3f(0,0,0);
             cycle_shad.Select();
             glPushMatrix();
-            glTranslatef(modelShift + 1.5f,0,0); // follow the model
+            if ( styleModel )
+            {
+                // stretch the classic shadow (x from -0.6 to 2.1) over the
+                // custom model, which runs from styleBack_ to styleFront_
+                REAL const back = styleBack_ - styleFront_ + 1.5f;
+                REAL const scale = ( styleFront_ - styleBack_ ) / 2.7f;
+                glTranslatef( back + .6f * scale, 0, 0 );
+                glScalef( scale, 1, 1 );
+            }
+            else if ( !mp )
+                glTranslatef(modelShift + 1.5f,0,0); // follow the model
             BeginQuads();
             glTexCoord2f(0,1);
             glVertex3f(-.6,.4,h);

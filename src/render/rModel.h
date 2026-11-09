@@ -79,6 +79,10 @@ public:
     static void ClearCache();
     
     void Render();
+
+    //! the model's extent along x (its length axis), over the vertices its
+    //! faces use; returns false for an empty model
+    bool LengthBounds( REAL & minX, REAL & maxX ) const;
 };
 
 #endif

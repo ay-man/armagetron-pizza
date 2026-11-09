@@ -187,6 +187,13 @@ public:
     gTextureCycle  *wheelTex,*bodyTex;
     gTextureCycle  *customTexture;
 
+    // custom cycle model from cycles/<CYCLE_MODEL>/, drawn for your own cycle
+    tString         styleModelName_;            //!< CYCLE_MODEL the model below was loaded for
+    rModel         *styleModel_;                //!< the model, or NULL for the classic cycle
+    gTextureCycle  *styleTexture_;              //!< its texture, coloured for this cycle
+    REAL            styleFront_, styleBack_;    //!< the model's extent along its length axis
+    void            UpdateStyleModel();         //!< (re)loads the model when CYCLE_MODEL changed
+
     eCoord rotationFrontWheel,rotationRearWheel; 	// wheel position (rotation)
     REAL   heightFrontWheel,heightRearWheel;  		// wheel (suspension)
 public:

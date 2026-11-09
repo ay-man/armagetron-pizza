@@ -27,7 +27,7 @@ The `gGame` class inherits from `nNetObject` for network synchronization. Game s
 ├── gArmagetron.cpp        # Main game entry point
 ├── gCamera.cpp            # Game camera control
 ├── gCamera.h             # Game camera control header
-├── gCycle.cpp             # Lightcycle game logic and rendering (incl. client-side visibility aids: CYCLE_POSITION_MARKER*, CYCLE_FLAT_STYLE, CYCLE_RUBBER_RING, CYCLE_ENEMY_SCALE)
+├── gCycle.cpp             # Lightcycle game logic and rendering (incl. client-side visibility aids: CYCLE_POSITION_MARKER*, CYCLE_FLAT_STYLE, CYCLE_RUBBER_RING, CYCLE_ENEMY_SCALE, CYCLE_FRONT_EXACT; custom models: CYCLE_MODEL -> cycles/<name>/)
 ├── gCycle.h              # Lightcycle game logic header
 ├── gCycleMovement.cpp     # Cycle movement physics
 ├── gCycleMovement.h      # Cycle movement physics header

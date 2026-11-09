@@ -352,6 +352,24 @@ rModel::~rModel(){
 static std::map<std::string, rModel *> sr_modelCache;
 
 //! returns a model from the cache
+bool rModel::LengthBounds( REAL & minX, REAL & maxX ) const
+{
+    bool found = false;
+    for ( int i = modelFaces.Len() - 1; i >= 0; --i )
+    {
+        for ( int j = 0; j < 3; ++j )
+        {
+            REAL x = vertices( modelFaces( i ).A[j] ).x[0];
+            if ( !found || x < minX )
+                minX = x;
+            if ( !found || x > maxX )
+                maxX = x;
+            found = true;
+        }
+    }
+    return found;
+}
+
 rModel * rModel::GetModel(const char * filename)
 {
     std::string key(filename);

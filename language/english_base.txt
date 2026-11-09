@@ -2144,6 +2144,14 @@ texture_style_contrast_help	Black floor with bold white grid lines and visible h
 texture_style_minimal		Minimal
 texture_style_minimal_help	Black floor with faint grid lines only, flat trails, plain arena walls.
 
+#cycle models
+cycle_model_text		Cycle Model:
+cycle_model_help		The model drawn for your own cycle; only you see it. Its front always sits exactly on your true position. Add your own as cycles/<name>/cycle.ase and bike.png in your user data folder and set CYCLE_MODEL <name>.
+cycle_model_classic		Classic
+cycle_model_classic_help	The original light cycle.
+cycle_model_garbage_truck	Garbage Truck
+cycle_model_garbage_truck_help	A cycle-sized garbage truck in your colour. The front of its bumper is your true position.
+
 #cycle visibility menu
 cycle_visibility_menu		Cycle Visibility
 cycle_visibility_menu_help	Make cycles easier to read: exact positions, high contrast, rubber and brakes at a glance.

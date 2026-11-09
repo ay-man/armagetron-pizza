@@ -23,6 +23,7 @@ Based on upstream Armagetron Advanced `legacy_0.2.9` (commit `3198557f`).
   - Rubber and brake rings around your own cycle (`CYCLE_RUBBER_RING`, on).
   - Draw opponents up to 2x bigger, sized around their true position (`CYCLE_ENEMY_SCALE`, 1).
 - Texture styles (Display Settings > Preferences > Texture Style, `TEXTURE_STYLE`): Classic, Clean, High Contrast and Minimal floor grids, trails, arena walls and cycle textures (`cycle_body`, `cycle_wheel`; seen when High Contrast Cycles is off, switching applies from the next round). Styles live in `textures/styles/<name>/` and are made by `textures/styles/generate.sh`; any texture a style doesn't replace stays classic.
+- Custom cycle models (Display Settings > Preferences > Cycle Model, `CYCLE_MODEL <folder>`): a model from `cycles/<folder>/cycle.ase` + `bike.png` for your own cycle, only on your screen. Its front-most point is placed exactly on your true position and its shadow stretches to fit. Ships with a Garbage Truck (`cycles/garbage_truck/`, made by its `generate.py`); add your own in your user data folder.
 
 ### Changed
 
